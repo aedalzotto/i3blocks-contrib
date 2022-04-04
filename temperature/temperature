@@ -29,24 +29,27 @@ my $t_warn = $ENV{T_WARN} || 70;
 my $t_crit = $ENV{T_CRIT} || 90;
 my $chip = $ENV{SENSOR_CHIP} || "";
 my $temperature = -9999;
+my $sensor = $ENV{INPUT_SENSOR} || "temp1_input";
 
 sub help {
     print "Usage: temperature [-w <warning>] [-c <critical>] [--chip <chip>]\n";
     print "-w <percent>: warning threshold to become yellow\n";
     print "-c <percent>: critical threshold to become red\n";
     print "--chip <chip>: sensor chip\n";
+    print "--sensor <sensor>: input sensor string\n";
     exit 0;
 }
 
 GetOptions("help|h" => \&help,
            "w=i"    => \$t_warn,
            "c=i"    => \$t_crit,
-           "chip=s" => \$chip);
+           "chip=s" => \$chip,
+           "sensor=s" => \$sensor);
 
 # Get chip temperature
 open (SENSORS, "sensors -u $chip |") or die;
 while (<SENSORS>) {
-    if (/^\s+temp1_input:\s+[\+]*([\-]*\d+\.\d)/) {
+    if (/^\s+$sensor:\s+[\+]*([\-]*\d+\.\d)/) {
         $temperature = $1;
         last;
     }
